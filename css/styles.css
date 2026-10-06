@@ -1,0 +1,409 @@
+/* =====================================================================
+   Estilos · Realidad aumentada del plano de Sastre
+   Mobile-first, vertical. Colores y tipografías, abajo, en :root.
+   ===================================================================== */
+
+:root {
+  --tinta: #14202B;          /* azul casi negro, como tinta de plano */
+  --tinta-2: #22323F;
+  --papel: #F4EDDD;
+  --ocre: #E9B949;           /* el mismo del contorno en la cámara */
+  --linea: rgba(244, 237, 221, 0.4);
+
+  --serif: "Spectral", Georgia, "Times New Roman", serif;
+  --sans: "Public Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  --margen: 16px;
+  --alto-boton: 56px;
+}
+
+[hidden] { display: none !important; }
+
+*, *::before, *::after { box-sizing: border-box; }
+
+/* El fondo va en <html> y no en <body>: MindAR dibuja el video y el canvas
+   detrás del contenido, y un fondo en <body> los taparía. */
+html {
+  background: var(--tinta);
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100%;
+  font-family: var(--sans);
+  font-size: 1rem;
+  line-height: 1.45;
+  color: var(--papel);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  overflow: hidden;
+}
+
+button, input { font: inherit; }
+
+:focus-visible {
+  outline: 3px solid var(--ocre);
+  outline-offset: 3px;
+}
+
+/* ---------- Pantallas completas (portada, cargando, error) ---------- */
+
+.pantalla {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: var(--tinta);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: var(--margen);
+  padding-top: calc(var(--margen) + env(safe-area-inset-top));
+  padding-bottom: calc(24px + env(safe-area-inset-bottom));
+  overflow: hidden;
+}
+
+.damero {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.portada-texto {
+  position: relative;       /* queda por encima del dibujo */
+  max-width: 420px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 24px 8px 0;
+  background: linear-gradient(to bottom, rgba(20, 32, 43, 0), var(--tinta) 38%);
+}
+
+.museo {
+  margin: 0 0 8px;
+  font-size: 0.95rem;
+  color: var(--ocre);
+}
+
+h1 {
+  margin: 0 0 20px;
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: clamp(1.9rem, 8.5vw, 2.5rem);
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+}
+
+.instruccion {
+  margin: 0 0 20px;
+  font-size: 1.15rem;
+}
+
+.nota {
+  margin: 14px 0 0;
+  font-size: 0.9rem;
+  color: rgba(244, 237, 221, 0.78);
+}
+
+/* ---------- Botones ---------- */
+
+.btn-principal {
+  display: block;
+  width: 100%;
+  min-height: 60px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--papel);
+  color: var(--tinta);
+  font-weight: 600;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+.btn-principal:active { background: var(--ocre); }
+
+.btn-chico {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1.5px solid var(--linea);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--papel);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+/* ---------- Cargando / error ---------- */
+
+.pantalla-estado {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+}
+.pantalla-estado h2 {
+  margin: 8px 0 0;
+  font-family: var(--serif);
+  font-size: 1.6rem;
+  line-height: 1.2;
+}
+.pantalla-estado p {
+  margin: 0 0 16px;
+  max-width: 320px;
+  font-size: 1.05rem;
+}
+.pantalla-estado .btn-principal { max-width: 320px; }
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--linea);
+  border-top-color: var(--ocre);
+  border-radius: 50%;
+  animation: girar 0.9s linear infinite;
+}
+@keyframes girar { to { transform: rotate(360deg); } }
+
+/* ---------- Avisos sobre la cámara ---------- */
+
+.aviso, .leyenda {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  max-width: calc(100% - 2 * var(--margen));
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: rgba(20, 32, 43, 0.9);
+  color: var(--papel);
+  text-align: center;
+  pointer-events: none;
+}
+
+.aviso {
+  top: calc(12px + env(safe-area-inset-top));
+  font-weight: 600;
+  font-size: 1rem;
+  border: 1.5px solid var(--linea);
+}
+
+/* El aviso de "perdido" es discreto: más chico y con un punto ocre */
+.aviso-perdido {
+  font-size: 0.95rem;
+  font-weight: 400;
+  padding: 8px 16px 8px 14px;
+}
+.aviso-perdido::before {
+  content: "";
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin-right: 10px;
+  border-radius: 50%;
+  background: var(--ocre);
+}
+
+.leyenda {
+  top: calc(64px + env(safe-area-inset-top));
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 1.15rem;
+}
+
+/* ---------- Panel de controles ---------- */
+
+.panel {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 60;
+  padding: 12px var(--margen);
+  padding-bottom: calc(14px + env(safe-area-inset-bottom));
+  background: rgba(20, 32, 43, 0.94);
+  border-top: 1.5px solid var(--linea);
+  border-radius: 20px 20px 0 0;
+  max-height: 65dvh;          /* con tres sliders, que el panel pueda scrollear en pantallas bajas */
+  overflow-y: auto;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+.fila-barra {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.panel.colapsado #panel-contenido { display: none; }
+
+.capas {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 12px 0 4px;
+}
+
+.btn-capa {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: var(--alto-boton);
+  padding: 8px 4px;
+  border: 2px solid var(--papel);
+  border-radius: 14px;
+  background: var(--tinta-2);
+  color: var(--papel);
+  font-weight: 600;
+  font-size: 0.9rem;
+  line-height: 1.15;
+  text-align: center;
+  cursor: pointer;
+}
+/* Indicador de encendido/apagado: círculo vacío o lleno */
+.btn-capa::before {
+  content: "";
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+}
+.btn-capa[aria-pressed="true"] {
+  background: var(--papel);
+  color: var(--tinta);
+}
+.btn-capa[aria-pressed="true"]::before {
+  background: var(--tinta);
+  box-shadow: inset 0 0 0 2px var(--papel);
+}
+.btn-capa .sub {
+  display: block;
+  font-weight: 400;
+  font-size: 0.8rem;
+}
+.btn-capa:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ---------- Sliders ---------- */
+
+.control { margin-top: 14px; }
+
+.control label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-weight: 600;
+  font-size: 1rem;
+}
+.control output { font-variant-numeric: tabular-nums; }
+
+.extremos {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: rgba(244, 237, 221, 0.8);
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: 44px;               /* zona de toque cómoda */
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--linea);
+}
+input[type="range"]::-moz-range-track {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--linea);
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 32px;
+  height: 32px;
+  margin-top: -12px;
+  border: 3px solid var(--tinta);
+  border-radius: 50%;
+  background: var(--ocre);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 26px;
+  height: 26px;
+  border: 3px solid var(--tinta);
+  border-radius: 50%;
+  background: var(--ocre);
+}
+
+/* ---------- Hoja del punto de interés ---------- */
+
+.hoja {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 70;                /* por encima del panel de controles */
+  max-height: 60dvh;
+  overflow-y: auto;
+  padding: 20px calc(var(--margen) + 4px);
+  padding-bottom: calc(20px + env(safe-area-inset-bottom));
+  background: var(--papel);
+  color: var(--tinta);
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.35);
+  animation: subir 0.22s ease-out;
+}
+@keyframes subir {
+  from { transform: translateY(24px); opacity: 0; }
+  to   { transform: none; opacity: 1; }
+}
+
+.hoja h2 {
+  margin: 0 0 8px;
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 1.5rem;
+  line-height: 1.2;
+}
+.hoja p {
+  margin: 0 0 18px;
+  max-width: 60ch;
+  font-size: 1.05rem;
+}
+
+.btn-hoja {
+  width: 100%;
+  min-height: var(--alto-boton);
+  border: 0;
+  border-radius: 14px;
+  background: var(--tinta);
+  color: var(--papel);
+  font-weight: 600;
+  font-size: 1.05rem;
+  cursor: pointer;
+}
+.hoja :focus-visible { outline-color: var(--tinta); }
+
+/* ---------- Preferencias del sistema ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .hoja { animation: none; }
+  .spinner { animation-duration: 2.4s; }
+}
+
+/* Pantallas bajas (celulares chicos o apaisados): panel más compacto */
+@media (max-height: 640px) {
+  .control { margin-top: 6px; }
+  .btn-capa { min-height: 48px; }
+}

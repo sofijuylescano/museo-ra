@@ -1,0 +1,26 @@
+{
+  "_leeme": "EJEMPLO: reemplazá nombres, textos y posiciones por los reales. x e y van de 0 a 1 sobre la imagen trazado-actual.png (x=0 borde izquierdo, x=1 borde derecho; y=0 borde superior, y=1 borde inferior).",
+  "puntos": [
+    {
+      "id": "plaza",
+      "nombre": "Plaza 25 de Mayo",
+      "descripcion": "Texto de ejemplo. Acá va una descripción corta (dos o tres oraciones) de cómo era este lugar en el plano de 1824 y qué hay hoy.",
+      "x": 0.5,
+      "y": 0.5
+    },
+    {
+      "id": "convento",
+      "nombre": "Convento de San Francisco",
+      "descripcion": "Texto de ejemplo. Reemplazalo por el texto definitivo de la guía.",
+      "x": 0.46,
+      "y": 0.55
+    },
+    {
+      "id": "museo",
+      "nombre": "Museo Etnográfico y Colonial",
+      "descripcion": "Texto de ejemplo. Podés indicar acá dónde está el museo respecto de la traza original.",
+      "x": 0.54,
+      "y": 0.44
+    }
+  ]
+}

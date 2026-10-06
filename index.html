@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#14202B">
+  <title>De Santa Fe la Vieja a Santa Fe de la Vera Cruz · Realidad aumentada</title>
+
+  <!-- Tipografías (si no cargan, se usan las del sistema) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600&family=Spectral:wght@500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/styles.css">
+
+  <!-- A-Frame y MindAR (versiones fijas para que no se rompa si salen nuevas) -->
+  <script src="https://cdn.jsdelivr.net/npm/aframe@1.5.0/dist/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+</head>
+<body>
+  <!-- La escena de A-Frame/MindAR se crea desde js/app.js -->
+
+  <!-- PORTADA -->
+  <main id="inicio" class="pantalla interactivo">
+    <!-- Dos trazados superpuestos: el viejo y el nuevo, apenas girado -->
+    <svg class="damero" viewBox="0 0 400 800" preserveAspectRatio="xMidYMin slice" aria-hidden="true" focusable="false">
+      <defs>
+        <pattern id="manzanas-viejas" width="64" height="64" patternUnits="userSpaceOnUse">
+          <rect x="4" y="4" width="56" height="56" fill="none" stroke="#F4EDDD" stroke-opacity="0.24" stroke-width="1.5"/>
+        </pattern>
+        <pattern id="manzanas-nuevas" width="72" height="72" patternUnits="userSpaceOnUse" patternTransform="rotate(8)">
+          <rect x="5" y="5" width="62" height="62" fill="none" stroke="#E9B949" stroke-opacity="0.5" stroke-width="1.5"/>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#manzanas-viejas)"/>
+      <rect width="100%" height="100%" fill="url(#manzanas-nuevas)"/>
+    </svg>
+
+    <div class="portada-texto">
+      <p class="museo">Museo Etnográfico y Colonial de Santa Fe</p>
+      <h1>De Santa Fe la Vieja a Santa Fe de la Vera Cruz</h1>
+      <p class="instruccion">Apuntá la cámara al plano del folleto</p>
+      <button id="btn-comenzar" class="btn-principal" type="button">Comenzar</button>
+      <p class="nota">Vamos a pedirte permiso para usar la cámara. No se guarda ninguna imagen.</p>
+    </div>
+  </main>
+
+  <!-- CARGANDO / ERROR -->
+  <div id="estado" class="pantalla pantalla-estado interactivo" role="alertdialog" aria-labelledby="estado-titulo" aria-describedby="estado-texto" hidden>
+    <div class="spinner" aria-hidden="true"></div>
+    <h2 id="estado-titulo"></h2>
+    <p id="estado-texto"></p>
+    <button id="btn-reintentar" class="btn-principal" type="button" hidden>Volver a intentar</button>
+  </div>
+
+  <!-- AVISOS SOBRE LA CÁMARA -->
+  <div id="buscando" class="aviso" role="status" hidden>Apuntá la cámara al plano del folleto</div>
+  <div id="aviso-perdido" class="aviso aviso-perdido" role="status" hidden>Volvé a apuntar al plano</div>
+  <div id="leyenda" class="leyenda" role="status" hidden></div>
+
+  <!-- PANEL DEL PUNTO DE INTERÉS -->
+  <section id="hoja" class="hoja interactivo" aria-labelledby="hoja-titulo" hidden>
+    <h2 id="hoja-titulo"></h2>
+    <p id="hoja-texto"></p>
+    <button id="btn-cerrar-hoja" class="btn-hoja" type="button">Cerrar</button>
+  </section>
+
+  <!-- CONTROLES -->
+  <section id="panel" class="panel interactivo" aria-label="Controles del mapa" hidden>
+    <div class="fila-barra">
+      <button id="btn-controles" class="btn-chico" type="button" aria-expanded="true" aria-controls="panel-contenido">Ocultar controles</button>
+      <button id="btn-restablecer" class="btn-chico" type="button">Restablecer</button>
+    </div>
+
+    <div id="panel-contenido">
+      <div class="capas" role="group" aria-label="Capas">
+        <button class="btn-capa" type="button" data-capa="actual" aria-pressed="true">Trazado actual</button>
+        <button class="btn-capa" type="button" data-capa="casco" aria-pressed="true">Casco histórico <span class="sub">(traza de 1824)</span></button>
+        <button class="btn-capa" type="button" data-capa="puntos" aria-pressed="true">Puntos de interés</button>
+      </div>
+
+      <div class="control">
+        <label for="rng-plano">
+          <span>Plano de 1824</span>
+          <output id="val-plano" for="rng-plano"></output>
+        </label>
+        <input id="rng-plano" type="range" min="0" max="100" step="1">
+      </div>
+
+      <div class="control">
+        <label for="rng-opacidad">
+          <span>Trazado actual</span>
+          <output id="val-opacidad" for="rng-opacidad"></output>
+        </label>
+        <input id="rng-opacidad" type="range" min="0" max="100" step="1">
+      </div>
+
+      <div class="control">
+        <label for="rng-escala">
+          <span>Escala de visualización</span>
+          <output id="val-escala" for="rng-escala"></output>
+        </label>
+        <input id="rng-escala" type="range">
+        <div class="extremos" aria-hidden="true"><span>Más chico</span><span>Más grande</span></div>
+      </div>
+    </div>
+  </section>
+
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
